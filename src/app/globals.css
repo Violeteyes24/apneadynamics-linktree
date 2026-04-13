@@ -76,7 +76,11 @@ body {
   min-height: 100svh;
   display: grid;
   place-items: center;
-  padding: clamp(1.25rem, 4vw, 2.5rem);
+  padding:
+    max(1.1rem, env(safe-area-inset-top))
+    max(1rem, env(safe-area-inset-right))
+    max(1.1rem, env(safe-area-inset-bottom))
+    max(1rem, env(safe-area-inset-left));
 }
 
 .hero-card {
@@ -203,6 +207,35 @@ h1 {
 @media (min-width: 720px) {
   .cta-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .hero-card {
+    border-radius: 1.1rem;
+    padding: 1.1rem;
+  }
+
+  h1 {
+    font-size: clamp(1.65rem, 8.8vw, 2.15rem);
+  }
+
+  .subtitle {
+    font-size: clamp(0.88rem, 5vw, 1.05rem);
+    line-height: 1.5;
+  }
+
+  .intro {
+    font-size: 0.98rem;
+    line-height: 1.58;
+  }
+
+  .cta-link {
+    padding: 0.86rem 0.9rem;
+  }
+
+  .cta-title {
+    font-size: 1.08rem;
   }
 }
 

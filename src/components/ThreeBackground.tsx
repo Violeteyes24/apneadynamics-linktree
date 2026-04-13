@@ -77,20 +77,8 @@ function ParticleField() {
 }
 
 export default function ThreeBackground() {
-  const [canAnimate, setCanAnimate] = useState(() => {
-    if (typeof window === "undefined") {
-      return false;
-    }
-
-    const reducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
-    const lowCoreCount = navigator.hardwareConcurrency > 0
-      ? navigator.hardwareConcurrency <= 4
-      : false;
-
-    return !reducedMotion && !lowCoreCount;
-  });
+  const [canAnimate, setCanAnimate] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -103,14 +91,20 @@ export default function ThreeBackground() {
       setCanAnimate(!nowReduced && !lowCoreCount);
     };
 
+    const rafId = window.requestAnimationFrame(() => {
+      handleChange();
+      setIsMounted(true);
+    });
+
     mediaQuery.addEventListener("change", handleChange);
 
     return () => {
+      window.cancelAnimationFrame(rafId);
       mediaQuery.removeEventListener("change", handleChange);
     };
   }, []);
 
-  if (!canAnimate) {
+  if (!isMounted || !canAnimate) {
     return <div className="three-fallback" aria-hidden="true" />;
   }
 
