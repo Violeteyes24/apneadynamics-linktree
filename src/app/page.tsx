@@ -2,7 +2,7 @@ import ThreeBackground from "@/components/ThreeBackground";
 
 const links = [
   {
-    title: "Zero to Hero Campaign",
+    title: "Zero to Hero",
     href: "https://www.freediveacademy.com/zero-to-hero/",
     description:
       "Build a complete progression from beginner fundamentals to deeper confidence.",

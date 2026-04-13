@@ -23,7 +23,7 @@ const lato = Lato({
 export const metadata: Metadata = {
   title: "Freedive Academy Panglao | Link Hub",
   description:
-    "Freedive Academy Panglao official link hub for Zero to Hero Campaign and Weekly Packages.",
+    "Freedive Academy Panglao official link hub for Zero to Hero and Weekly Packages.",
 };
 
 export default function RootLayout({
