@@ -81,14 +81,16 @@ export default function ThreeBackground() {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const reducedQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const coarsePointerQuery = window.matchMedia("(pointer: coarse)");
     const lowCoreCount = navigator.hardwareConcurrency > 0
       ? navigator.hardwareConcurrency <= 4
       : false;
 
     const handleChange = () => {
-      const nowReduced = mediaQuery.matches;
-      setCanAnimate(!nowReduced && !lowCoreCount);
+      const nowReduced = reducedQuery.matches;
+      const isCoarse = coarsePointerQuery.matches;
+      setCanAnimate(!nowReduced && !isCoarse && !lowCoreCount);
     };
 
     const rafId = window.requestAnimationFrame(() => {
@@ -96,11 +98,13 @@ export default function ThreeBackground() {
       setIsMounted(true);
     });
 
-    mediaQuery.addEventListener("change", handleChange);
+    reducedQuery.addEventListener("change", handleChange);
+    coarsePointerQuery.addEventListener("change", handleChange);
 
     return () => {
       window.cancelAnimationFrame(rafId);
-      mediaQuery.removeEventListener("change", handleChange);
+      reducedQuery.removeEventListener("change", handleChange);
+      coarsePointerQuery.removeEventListener("change", handleChange);
     };
   }, []);
 
