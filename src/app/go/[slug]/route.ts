@@ -33,7 +33,7 @@ export async function GET(_request: Request, { params }: { params: Promise<Param
       });
 
       if (error) {
-        console.error("Click log failed:", error.message);
+        console.error("Click log failed:", error);
       }
     } else {
       console.warn("Supabase env missing; click not logged.");
