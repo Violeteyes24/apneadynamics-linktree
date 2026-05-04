@@ -1,10 +1,14 @@
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { NextResponse } from "next/server";
 
 import { offers } from "@/lib/offers";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 
 export const dynamic = "force-dynamic";
+
+const DEVICE_ID_COOKIE = "ad_device_id";
+const DEVICE_ID_MAX_AGE_SECONDS = 60 * 60 * 24 * 180;
+const DEFAULT_PLATFORM = "IG";
 
 type Params = {
   slug: string;
@@ -20,24 +24,45 @@ export async function GET(_request: Request, { params }: { params: Promise<Param
 
   try {
     const headersList = await headers();
+    const cookieStore = await cookies();
     const referrer = headersList.get("referer");
     const userAgent = headersList.get("user-agent");
+    const existingDeviceId = cookieStore.get(DEVICE_ID_COOKIE)?.value;
+    const deviceId = existingDeviceId ?? crypto.randomUUID();
+    const platform = DEFAULT_PLATFORM;
     const supabase = getSupabaseAdmin();
 
     if (supabase) {
       const { error } = await supabase.from("link_clicks").insert({
         offer_slug: offer.slug,
         destination_url: offer.href,
+        device_id: deviceId,
+        platform,
         referrer,
         user_agent: userAgent,
       });
 
-      if (error) {
+      if (error && error.code !== "23505") {
         console.error("Click log failed:", error);
       }
     } else {
       console.warn("Supabase env missing; click not logged.");
     }
+    const response = NextResponse.redirect(offer.href, { status: 307 });
+
+    if (!existingDeviceId) {
+      response.cookies.set({
+        name: DEVICE_ID_COOKIE,
+        value: deviceId,
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+        maxAge: DEVICE_ID_MAX_AGE_SECONDS,
+      });
+    }
+
+    return response;
   } catch (error) {
     console.error("Unexpected click logging error:", error);
   }
